@@ -1,41 +1,12 @@
 {
-  "a6f11984-0e97-784c-f46e-d8e2f0d4b9fe": {
-    "gameId": "a6f11984-0e97-784c-f46e-d8e2f0d4b9fe",
+  "eab43636-64db-4f98-a908-530076b7cce2": {
+    "gameId": "eab43636-64db-4f98-a908-530076b7cce2",
     "clients": [
       {
-        "clientId": "saran",
-        "color": "rgba(87, 33, 130, 0.21)",
-        "x": 300,
-        "y": 350
-      },
-      {
-        "clientId": "saha",
-        "color": "rgba(199, 218, 38, 0.90)",
-        "x": 75,
-        "y": 200
-      },
-      {
-        "clientId": "mug",
-        "color": "rgba(88, 59, 33, 0.99)",
-        "x": 550,
-        "y": 275
-      }
-    ]
-  },
-  "61b1784e-1e2d-26c0-5e03-c3be759717c2": {
-    "gameId": "61b1784e-1e2d-26c0-5e03-c3be759717c2",
-    "clients": [
-      {
-        "clientId": "rtytuyi",
-        "color": "rgba(104, 254, 76, 0.59)",
-        "x": 450,
-        "y": 500
-      },
-      {
-        "clientId": "sdfsd",
-        "color": "rgba(122, 89, 204, 0.17)",
+        "clientId": "asdfasd",
+        "color": "rgba(136, 192, 249, 0.87)",
         "x": 150,
-        "y": 350
+        "y": 325
       }
     ]
   }

@@ -28,11 +28,18 @@ let clients = {}
 let registered_users = []
 let games = {}
 
+let clientIds = []
+let formattedClientData = {};
+
+
 // when client sends a request
 wsServer.on("request", request => {
     const connection = request.accept(null, request.origin);
     connection.on("open", ()=>console.log("connection opened"));
-    
+    connection.on('error', function error(err) {
+        console.error('WebSocket encountered an error:', err.message);
+    });
+      
     //when receving message from client 
     connection.on("message", (message) => {
 
@@ -40,11 +47,22 @@ wsServer.on("request", request => {
 
         //user makes a connection
         if(result.method == "connect"){
-            registered_users.push(result.clientId);
+             
+            if(clients.hasOwnProperty(result.clientId)){
+                connection.close();
+            }
             clients[result.clientId] = {
                 "userId" : result.clientId,
                 "connection" : connection
             }
+            // for (const clientId in clients) {
+            //     formattedClientData[clientId] = {
+            //         "clientId": clients[clientId].userId,
+                     
+            //     };
+            // }
+            // writeUserDataToFile();
+
             console.log(`Id from client is ${result.clientId}`);
         }
 
@@ -99,11 +117,79 @@ wsServer.on("request", request => {
             
         }
 
+        if(result.method == "play"){
+            /*expecting data to send to all the clients for that i have to know which 
+            client is play by their "play request", if that client is playing then 
+            he should trigger keyboard events, on trigeering i should initiate play 
+            request,
+            ->to broadcast the data to all clients i think i should have a structure like
+            ->check for their x and y direction 
+            const payLoad = {
+                "clientId" : clientId,
+                ""
+            }
+            */
+            const  gameId = result.gameId;
+            const game = games[gameId]; 
+            // let users = {}
+            // users[result.userId] = {
+        
+            //     "xdirection" : result.xdirection,
+            //     "ydirection" : result.ydirection
+            // }
+            const clientToUpdate = game.clients.find(client => client.clientId == result.clientId);
+
+            if(clientToUpdate){
+                clientToUpdate.x = result.x;
+                clientToUpdate.y = result.y;
+                clientToUpdate.xdirection = result.xdirection;
+                clientToUpdate.ydirection = result.ydirection;
+            }
+            console.log(game);
+
+            const payLoad = {
+                "method" : "update",
+                "game" : game
+            }
+       
+            // setInterval(() => {
+
+                game.clients.forEach(client => {
+                    clients[client.clientId].connection.send(JSON.stringify(payLoad));
+                });
+            // }, 500);
+         
+          
+            
+            /*
+            structure of 
+            const result = {
+                "method" : "play",
+                "clientId" : clientId,
+                "xdirction" : 1,
+                "ydirection" : 0
+                "gameId" : particularGameId,
+            }
+            */
+           
+        }
+
+        if(result.medthod == "update"){
+            const clientId = result.clientId;
+           const game = games[clientId];
+           const clientToUpdate = game.clients.find(client => client.clientId == result.clientId);
+
+            if(clientToUpdate){
+                console.log(result.x);
+                console.log(result.y);
+                clientToUpdate.x = result.x;
+                clientToUpdate.y = result.y;
+            }
+        }
 
 
 
 
-        // connection.send(JSON.stringify(clients[registered_users[0].userId]));
     })
 
 
@@ -126,7 +212,7 @@ const guid=()=> {
 
 function randomXPosition() {
     // Calculate the number of columns
-    const numCols = 25;
+    const numCols = 15;
 
     // Generate a random column index
     const randomCol = Math.floor(Math.random() * numCols);
@@ -139,7 +225,7 @@ function randomXPosition() {
 
 function randomYPosition() {
     // Calculate the number of rows
-    const numRows = 30;
+    const numRows = 20;
 
     // Generate a random row index
     const randomRow = Math.floor(Math.random() * numRows);
@@ -165,5 +251,37 @@ function writeGameDataToFile() {
         console.error('Error writing game data to file:', err);
     }
 }
+
+function writeUserDataToFile() {
+    try {
+        fs.writeFileSync('users.json', JSON.stringify(formattedClientData, null, 2), 'utf8');
+        console.log('Game data written to file successfully');
+    } catch (err) {
+        console.error('Error writing game data to file:', err);
+    }
+}
+
+function isUserIdExists(userId, callback) {
+    fs.readFile('users.json', 'utf8', (err, data) => {
+      if (err) {
+        // Handle file read error
+        return callback(err);
+      }
+  
+      try {
+        const userIds = JSON.parse(data);
+        if (userIds.hasOwnProperty(userId)) {
+          // User ID exists
+          return callback(null, true);
+        } else {
+          // User ID does not exist
+          return callback(null, false);
+        }
+      } catch (parseError) {
+        // Handle JSON parse error
+        return callback(parseError);
+      }
+    });
+  }
 
 server.listen(8081, ()=> console.log("websocket server is listening on port 8081"));
