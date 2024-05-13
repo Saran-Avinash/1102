@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const fs = require("fs");
 const WebSocketServer = require("websocket").server;
-
+const MAX_USERS = 4;
 // front end server on port 8080
 app.get("/", (request, response) => {
     response.sendFile(__dirname + "/index.html");
@@ -27,13 +27,19 @@ const wsServer = new WebSocketServer({
 let clients = {}
 let registered_users = []
 let games = {}
-
+let foodX = 0;
+let foodY = 0;
 let clientIds = []
 let formattedClientData = {};
 
 
 // when client sends a request
 wsServer.on("request", request => {
+    if(Object.keys(clients).length >= MAX_USERS){
+        request.reject(403, "Server Full");
+        console.log("Rejected connection - max players reached");
+        return;
+    }
     const connection = request.accept(null, request.origin);
     connection.on("open", ()=>console.log("connection opened"));
     connection.on('error', function error(err) {
@@ -190,12 +196,27 @@ wsServer.on("request", request => {
 
 
 
+
     })
 
 
     connection.on("close", ()=>console.log("Closed"));
     
 })
+function generateRandomFoodPosition() {
+    const numRows = 20; // Number of rows in the game grid
+    const numCols = 15; // Number of columns in the game grid
+
+    const randomRow = Math.floor(Math.random() * numRows);
+    const randomCol = Math.floor(Math.random() * numCols);
+
+    
+    foodX =  randomCol * 25, // Each column is 25 pixels wide
+        foodY = randomRow * 25  // Each row is 25 pixels tall
+
+
+    
+}
 
 const guid=()=> {
     const s4=()=> Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);     

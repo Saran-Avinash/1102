@@ -6,27 +6,113 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        * {
-            overflow: hidden;
+         
+      body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #191919;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .container:hover {
+            transform: scale(1.05);
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 48px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            margin-bottom: 10px;
+            font-size: 20px;
+            display: block;
+            color: #FFD700;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 30px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 18px;
+            outline: none;
+        }
+        input[type="submit"] {
+            width: calc(100% - 30px);
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: #FF6347;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #FF4500;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: #fff;
+            font-size: 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        #game-id {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #FFD700;
+        }
+        canvas {
+            margin-top: 30px;
+            border: 4px solid #FFD700;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+
         }
     </style>
 </head>
-<body > 
+<body> 
     <label  for="" title="user name shoud be uniquq">UserName</label>
     <input id="user-input" type="text">
     <label for="" >Password</label>
     <input type="password" id="user-password">
-    <button type="submit" class="btn btn-primary" id="submit" >Submit</button>
-<br>
-    <button id="create-game-btn">Create Game</button>
+    <button type="submit" class="btn btn-primary" id="submit" >Submit</button>  
+  <br>
+    <button id="create-game-btn" class="btn btn-primary">Create Game</button>
     <p id="game-id"></p>
     <p>(or)</p>
     <input id="join-game-id" type="text">
-    <button id="join-game-btn">Join</button>
-
+    <button id="join-game-btn" class="btn btn-primary">Join</button><br>
+    <span>Score: </span>
+    <p id="score"></p>
     <h1 style="text-align: center;">Snake</h1>
     <div style="text-align: center;">
-        <canvas width="900px" height="700px" style="overflow: hidden;">
+        <canvas width="600px" height="400px"  style="overflow: hidden;">
 
         </canvas>
     </div>
@@ -46,6 +132,9 @@
         let gameover = false; 
         
 
+        let score = document.getElementById("score");
+        let foodX = 0;
+        let foodY = 0;
 
         let ws = null;
         //connection to websocket
@@ -55,9 +144,9 @@
         
         //userName submit event
         let button = document.getElementById("submit");
-        button.addEventListener("click", ()=>{
+         button.addEventListener("click", ()=>{
             
-         ws = new WebSocket("ws://localhost:8081");
+          ws = new WebSocket("ws://localhost:8081");
             clientId = document.getElementById("user-input").value;
             //password = document.getElementById("user-password").value;
             const clientInfo = {
@@ -95,10 +184,7 @@
                 if(response.method == "update"){
                     updateSnakeCoordinates(response.game);
                     console.log(response.game);
-                    renderSnakes();
-                    
-                    
-                    
+                    renderSnakes();    
                    /* response.game.clients.forEach(client => {
                         // Access the client ID
                         const clientId = client.clientId;
@@ -111,6 +197,20 @@
             
         }, false);
 
+        function generateRandomFoodPosition() {
+            const numRows = 15; // Number of rows in the game grid1515
+            const numCols = 15; // Number of columns in the game grid
+        
+            const randomRow = Math.floor(Math.random() * numRows);
+            const randomCol = Math.floor(Math.random() * numCols);
+        
+            
+            foodX =  randomCol * 25, // Each column is 25 pixels wide
+                foodY = randomRow * 25  // Each row is 25 pixels tall
+        
+        
+            
+        }
         //create game button and store result
         let creatGame = document.getElementById("create-game-btn");
         creatGame.addEventListener("click", ()=>{
@@ -234,29 +334,58 @@
                 ydirection : 0,
                 body: [],
                 color: snake_color,
+                score: 0,
               
             };
         }
-      
-        let foodPosition = generateRandomFoodPosition()
+        
+        generateRandomFoodPosition();
+
         function renderSnakes(){
             c.fillStyle = "black";
             c.fillRect(0, 0, rows*blockSize, cols*blockSize);
+
             c.fillStyle = "red";
-            c.fillRect(foodPosition.x, foodPosition.y, blockSize, blockSize);
+            c.fillRect(foodX, foodY, blockSize, blockSize);
+
             for (let clientId in snakes) {
                // c.fillStyle = "black";
                 let snake = snakes[clientId];
-                c.fillStyle = "green";
+                c.fillStyle = snake.color;
                 c.fillRect(snake.x , snake.y, blockSize, blockSize);
-                if(snake.x == foodPosition.x && snake.y == foodPosition.y){
-                    snake.body.push([foodPosition.x, foodPosition.y]);
-                    foodPosition = genereateRandomFoodPosition();
-                    console.log(snake.body);y
+
+                if(snake.x < 0 || snake.x > rows * 25 || snake.y < 0 || snake.y > cols * 25){
+                    alert("game over");
+                    return;
                 }
+                
+
+                if(snake.x == foodX && snake.y == foodY){
+                    snake.body.push([foodX, foodY]);
+                    snake.score = snake.score+1;
+                    document.getElementById("score").textContent = snake.score;
+                     generateRandomFoodPosition();
+    
+                    console.log(snake.body);
+                }
+
                 c.fillStyle='white';
                 c.fillText(snake.name,snake.x, snake.y- 10)
-          c.font='20px sans-serief';
+                c.font='20px sans-serief';
+             for(let i = snake.body.length - 1; i > 0; i--){
+            snake.body[i] = snake.body[i-1];
+            
+        }
+        if(snake.body.length){
+            snake.body[0] = [snake.x, snake.y];
+        }
+        c.fillStyle = snake.color;
+        for(let i = 0; i < snake.body.length; i++){
+            c.fillRect(snake.body[i][0], snake.body[i][1], blockSize, blockSize);
+            
+
+
+        
           const payLoad = {
               "method" : "update",
               "clientId" : clientId,
@@ -274,40 +403,18 @@
                     //} 
                 }
             }
+        }
            
+       
 
 
-            function animate() {
-                // Clear canvas
-                c.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Render snakes
-                renderSnakes();
-                
-    // Other animation logic
-    
-    // Request next frame
-    requestAnimationFrame(animate);
-}
 
+           
 // Start the animation loop
 
 
 //update movements
-function generateRandomFoodPosition() {
-    const numRows = 20; // Number of rows in the game grid
-    const numCols = 15; // Number of columns in the game grid
 
-    const randomRow = Math.floor(Math.random() * numRows);
-    const randomCol = Math.floor(Math.random() * numCols);
-
-    const foodPosition = {
-        x: randomCol * 25, // Each column is 25 pixels wide
-        y: randomRow * 25  // Each row is 25 pixels tall
-    };
-
-    return foodPosition;
-}
         function updateSnakeCoordinates(game) {
             // Iterate over the clients array in the game object
             game.clients.forEach(client => {
@@ -349,5 +456,5 @@ function generateRandomFoodPosition() {
 
 
     </script>
-</body>
+ </body>
 </html>
