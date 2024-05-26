@@ -1,0 +1,23 @@
+{
+  "41833db1-4283-6bdb-48af-a645eaf67aa3": {
+    "gameId": "41833db1-4283-6bdb-48af-a645eaf67aa3",
+    "clients": [
+      {
+        "clientId": "sacac",
+        "color": "rgba(91, 134, 202, 0.61)",
+        "x": 50,
+        "y": 325
+      },
+      {
+        "clientId": "dadsdvds",
+        "color": "rgba(244, 140, 248, 0.91)",
+        "x": 325,
+        "y": 100
+      }
+    ]
+  },
+  "b17dea28-df0a-824d-6e4c-6eb170f07e50": {
+    "gameId": "b17dea28-df0a-824d-6e4c-6eb170f07e50",
+    "clients": []
+  }
+}

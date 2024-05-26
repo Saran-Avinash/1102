@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body > 
+    <label  for="" title="user name shoud be uniquq">UserName</label>
+    <input id="user-input" type="text">
+    <label for="" >Password</label>
+    <input type="password" id="user-password">
+    <button type="submit" class="btn btn-primary" id="submit" >Submit</button>
+<br>
+    <button id="create-game-btn">Create Game</button>
+    <p id="game-id"></p>
+    <p>(or)</p>
+    <input id="join-game-id" type="text">
+    <button id="join-game-btn">Join</button>
+
+    <h1 style="text-align: center;">Snake</h1>
+    <div style="text-align: center;">
+        <canvas width="900px" height="700px" style="overflow: hidden;">
+
+        </canvas>
+    </div>
+
+
+    <script src="./index.js"></script>
+    <script src="./client_server.js"></script>
+</body>
+</html>
